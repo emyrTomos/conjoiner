@@ -48,7 +48,8 @@ function Handler(controller) {
 function BaseController(model, view) {
   Object.call(this);
   this.view = view;
-  this.model = new Proxy(model, this);
+  var handler = new Handler(this);
+  this.model = new Proxy(model, handler);
   this.bindings = [];
 }
 BaseController.prototype = Object.create(Object.prototype);

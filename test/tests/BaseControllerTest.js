@@ -1,13 +1,19 @@
 describe("BaseController", function() {
 	const model = {
 		title: "Some String",
+		notTitle: "Some String",
 		members : {first: {title: 'First member'}, second: {title: 'Second member'}}
 	}
 	model.getMemberByTitle = title => {return model.members.reduce(member => member.title === title)}
 	const el = document.createElement('span')
+	document.body.appendChild(el)
+	let receivedEvent
+	el.addEventListener('propertyChange', function(ev){
+		receivedEvent = ev
+		console.log('received event ', receivedEvent)
+	})
 	const controller = new conjoiner.BaseController(model)
-	console.log(controller.addBinding)
-	const binding = {target: el, event: 'functionCall', property: 'getMemberByTitle'}
+	const binding = {target: el, event: 'propertyChange', property: 'title'}
 	let lenBindings
 	beforeEach(function(){
 		lenBindings = controller.bindings.length
@@ -34,4 +40,14 @@ describe("BaseController", function() {
 			expect(controller.hasBinding(binding)).to.be.false
 		})
 	})
+	describe('#notify', function(){
+		it('element bound to propertyChange should receive an event when the field it is bound to is modified', function(){
+			controller.addBinding(binding)
+			controller.model.title = "Modified String"
+			receivedEvent.detail.event.should.equal('propertyChange')
+			receivedEvent.detail.property.should.equal('title')
+			receivedEvent.detail.value.should.equal("Modified String")
+		})
+	})
+
 });
