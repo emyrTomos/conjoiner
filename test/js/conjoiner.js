@@ -64,8 +64,16 @@ BaseController.prototype.notify = function(notification) {
 BaseController.prototype.addBinding = function(binding) {
   this.bindings.push(binding);
 };
+BaseController.prototype.hasBinding = function(binding) {
+  if (this.bindings.find((function(oldbinding) {
+    return oldbinding === binding;
+  }))) {
+    return true;
+  }
+  return false;
+};
 BaseController.prototype.removeBinding = function(binding) {
-  this.binding = this.bindings.filter((function(oldbinding) {
+  this.bindings = this.bindings.filter((function(oldbinding) {
     return oldbinding !== binding;
   }));
 };

@@ -52,8 +52,14 @@ BaseController.prototype.notify = function(notification) {
 BaseController.prototype.addBinding = function(binding) {
   this.bindings.push(binding)
 }
+BaseController.prototype.hasBinding = function(binding) {
+  if(this.bindings.find(oldbinding => oldbinding === binding)) {
+    return true
+  }
+  return false
+}
 BaseController.prototype.removeBinding = function(binding) {
-  this.binding = this.bindings.filter(oldbinding => oldbinding !== binding)
+  this.bindings = this.bindings.filter(oldbinding => oldbinding !== binding)
 }
 
 export default BaseController
