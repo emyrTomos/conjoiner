@@ -6,9 +6,28 @@ Object.defineProperties(exports, {
     }},
   __esModule: {value: true}
 });
-function Handler(controller) {
+var $__Notifier__;
+var Notifier = ($__Notifier__ = require("./Notifier"), $__Notifier__ && $__Notifier__.__esModule && $__Notifier__ || {default: $__Notifier__}).default;
+function BaseController(model, view) {
+  Notifier.prototype.constructor.call(this, model);
+  this.view = view;
+}
+BaseController.prototype = Object.create(Notifier.prototype);
+BaseController.prototype.constructor = BaseController;
+var $__default = BaseController;
+
+//# sourceURL=/home/emyr/WebstormProjects/conjoiner/classes/BaseController.js
+},{"./Notifier":2}],2:[function(require,module,exports){
+"use strict";
+Object.defineProperties(exports, {
+  default: {get: function() {
+      return $__default;
+    }},
+  __esModule: {value: true}
+});
+function Handler(notifier) {
   this.set = function(target, property, value, receiver) {
-    controller.notify({
+    notifier.notify({
       event: 'propertyChange',
       property: property,
       value: value
@@ -28,16 +47,16 @@ function Handler(controller) {
         };
         if (retVal.then) {
           notification.completed = false;
-          controller.notify(notification);
+          notifier.notify(notification);
           retVal.then((function(resolution) {
             notification.result = resolution;
             notification.completed = true;
-            controller.notify(notification);
+            notifier.notify(notification);
           }));
         } else {
           notification.result = retVal;
           notification.completed = true;
-          controller.notify(notification);
+          notifier.notify(notification);
         }
         return retVal;
       });
@@ -46,16 +65,16 @@ function Handler(controller) {
     }
   };
 }
-function BaseController(model, view) {
+function Notifier(model) {
   Object.call(this);
-  this.view = view;
   var handler = new Handler(this);
+  console.log('Creatiing proxy ', model, handler);
   this.model = new Proxy(model, handler);
   this.bindings = [];
 }
-BaseController.prototype = Object.create(Object.prototype);
-BaseController.prototype.constructor = BaseController;
-BaseController.prototype.notify = function(notification) {
+Notifier.prototype = Object.create(Object.prototype);
+Notifier.prototype.constructor = Notifier;
+Notifier.prototype.notify = function(notification) {
   this.bindings.forEach((function(binding) {
     if (binding.event === notification.event && binding.property === notification.property) {
       var modelEvent = new CustomEvent(notification.event, {detail: notification});
@@ -63,10 +82,10 @@ BaseController.prototype.notify = function(notification) {
     }
   }));
 };
-BaseController.prototype.addBinding = function(binding) {
+Notifier.prototype.addBinding = function(binding) {
   this.bindings.push(binding);
 };
-BaseController.prototype.hasBinding = function(binding) {
+Notifier.prototype.hasBinding = function(binding) {
   if (this.bindings.find((function(oldbinding) {
     return oldbinding === binding;
   }))) {
@@ -74,20 +93,23 @@ BaseController.prototype.hasBinding = function(binding) {
   }
   return false;
 };
-BaseController.prototype.removeBinding = function(binding) {
+Notifier.prototype.removeBinding = function(binding) {
   this.bindings = this.bindings.filter((function(oldbinding) {
     return oldbinding !== binding;
   }));
 };
-var $__default = BaseController;
+var $__default = Notifier;
 
-//# sourceURL=/home/emyr/WebstormProjects/conjoiner/classes/BaseController.js
-},{}],2:[function(require,module,exports){
+//# sourceURL=/home/emyr/WebstormProjects/conjoiner/classes/Notifier.js
+},{}],3:[function(require,module,exports){
 "use strict";
-var $__BaseController__;
+var $__BaseController__,
+    $__Notifier__;
 window.conjoiner = {};
 var BaseController = ($__BaseController__ = require("./BaseController"), $__BaseController__ && $__BaseController__.__esModule && $__BaseController__ || {default: $__BaseController__}).default;
+var Notifier = ($__Notifier__ = require("./Notifier"), $__Notifier__ && $__Notifier__.__esModule && $__Notifier__ || {default: $__Notifier__}).default;
 window.conjoiner.BaseController = BaseController;
+window.conjoiner.Notifier = Notifier;
 
 //# sourceURL=/home/emyr/WebstormProjects/conjoiner/classes/conjoiner.js
-},{"./BaseController":1}]},{},[2]);
+},{"./BaseController":1,"./Notifier":2}]},{},[3]);

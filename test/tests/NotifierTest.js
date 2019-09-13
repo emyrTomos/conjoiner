@@ -1,62 +1,58 @@
-describe("BaseController", function() {
+describe("Notifier", function() {
 	const model = {
 		title: "Some String",
 		notTitle: "Some String",
 		members: {first: {title: 'First member'}, second: {title: 'Second member'}},
 		syncFunction: input => 'Synchronous: ' + input
 	}
-	console.log(model.syncFunction(' Inline console call'))
 	const el = document.createElement('span')
-	document.body.appendChild(el)
 	let propertyChangeEvent
 	let syncFunctionCallEvent
 	el.addEventListener('propertyChange', function(ev){
 		propertyChangeEvent = ev
-		console.log('received propertyChange event ', propertyChangeEvent)
 	})
 	el.addEventListener('functionCall', function(ev){
 		if (ev.detail.property === 'syncFunction')
 		{
 			syncFunctionCallEvent = ev
-			console.log('received functionCall event ', syncFunctionCallEvent)
 		}
 	})
 	const propertyBinding = {target: el, event: 'propertyChange', property: 'title'}
 	const syncFunctionBinding = {target: el, event: 'functionCall', property: 'syncFunction'}
 	let lenBindings
 
-	const controller = new conjoiner.BaseController(model)
+	const notifier = new conjoiner.Notifier(model)
 	beforeEach(function(){
-		lenBindings = controller.bindings.length
+		lenBindings = notifier.bindings.length
 	})
 	describe('#addBinding', function(){
 		it("should add a binding to the bindings array", function() {
-			controller.addBinding(propertyBinding)
-			controller.bindings.length.should.equal(lenBindings + 1)
+			notifier.addBinding(propertyBinding)
+			notifier.bindings.length.should.equal(lenBindings + 1)
 		});
 	})
 	describe('#hasBinding', function(){
 		it('is expected to return true for binding', function(){
-			expect(controller.hasBinding(propertyBinding)).to.be.true
+			expect(notifier.hasBinding(propertyBinding)).to.be.true
 		})
 	})
 	describe('#removeBinding', function(){
 		it("should remove an element from the bindings", function() {
-			controller.removeBinding(propertyBinding)
-			controller.bindings.length.should.equal(lenBindings - 1)
+			notifier.removeBinding(propertyBinding)
+			notifier.bindings.length.should.equal(lenBindings - 1)
 		});
 	})
 	describe('#hasBinding', function(){
 		it('is expected to return false for binding', function(){
-			expect(controller.hasBinding(propertyBinding)).to.be.false
+			expect(notifier.hasBinding(propertyBinding)).to.be.false
 		})
 	})
 	describe('#notify', function(){
 		describe('property change notifications', function(){
 			it('bound element should receive an event when the property it is bound to is modified', function(){
-				controller.addBinding(propertyBinding)
+				notifier.addBinding(propertyBinding)
 				should.not.exist(propertyChangeEvent)
-				controller.model.title = "Modified String"
+				notifier.model.title = "Modified String"
 				should.exist(propertyChangeEvent)
 			})
 			it('event detail "event" property should be propertyChange', function(){
@@ -72,9 +68,9 @@ describe("BaseController", function() {
 		describe('synchonous function call notifications', function(){
 			let syncFunctionReturn
 			it('bound element should receive an event when the function it is bound to is called', function(){
-				controller.addBinding(syncFunctionBinding)
+				notifier.addBinding(syncFunctionBinding)
 				should.not.exist(syncFunctionCallEvent)
-				syncFunctionReturn = controller.model.syncFunction('Function call')
+				syncFunctionReturn = notifier.model.syncFunction('Function call')
 				should.exist(syncFunctionCallEvent)
 			})
 			it('event detail "event" property should be functionCall', function(){
