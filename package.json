@@ -15,10 +15,20 @@
     "controller",
     "proxy"
   ],
+  "browserify": {
+    "transform": [
+      "es6ify"
+    ]
+  },
   "author": "emyr.tomos@gmail.com",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
     "url": "https://github.com/emyrTomos/conjoiner/issues"
   },
-  "homepage": "https://github.com/emyrTomos/conjoiner#readme"
+  "homepage": "https://github.com/emyrTomos/conjoiner#readme",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babelify": "^10.0.0",
+    "http-server": "^0.11.1"
+  }
 }
