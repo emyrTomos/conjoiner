@@ -43,9 +43,17 @@ describe("BaseController", function() {
 	describe('#notify', function(){
 		it('element bound to propertyChange should receive an event when the field it is bound to is modified', function(){
 			controller.addBinding(binding)
+			should.not.exist(receivedEvent)
 			controller.model.title = "Modified String"
+			should.exist(receivedEvent)
+		})
+		it('event field should be propertyChange', function(){
 			receivedEvent.detail.event.should.equal('propertyChange')
+		})
+		it('property field should be property modified', function(){
 			receivedEvent.detail.property.should.equal('title')
+		})
+		it('value field should be the value that was set on the property', function(){
 			receivedEvent.detail.value.should.equal("Modified String")
 		})
 	})
