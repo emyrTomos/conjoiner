@@ -7,7 +7,8 @@ function Handler(controller) {
     const value = Reflect.get(target, property, receiver)
     if (typeof value === 'function') {
       return (function() {
-        const retVal = value.call(receiver, arguments)
+        const args = Array.from(arguments)
+        const retVal = value.apply(receiver, args)
         const notification = {event: 'functionCall', property: property, arguments: arguments}
         if(retVal.then) {
           notification.completed = false

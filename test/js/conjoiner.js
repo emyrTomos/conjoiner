@@ -19,7 +19,8 @@ function Handler(controller) {
     var value = Reflect.get(target, property, receiver);
     if (typeof value === 'function') {
       return (function() {
-        var retVal = value.call(receiver, arguments);
+        var args = Array.from(arguments);
+        var retVal = value.apply(receiver, args);
         var notification = {
           event: 'functionCall',
           property: property,
