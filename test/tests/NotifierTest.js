@@ -159,9 +159,9 @@ describe("Notifier", function() {
 		})
 		notifier.addBinding(deepPropertyBinding)
 		describe('deep object property access', function(){
-			const first = notifier.model.members.first
-			it('should be a proxy object', function(){
-				const proto = Object.getPrototypeOf(first)
+			const first = notifier.model.members
+			const proto = Object.getPrototypeOf(first)
+			it('should be a proxy object with getPrototypeOf trapped to return notifier', function(){
 				expect(proto).to.equal(notifier)
 			})
 		})

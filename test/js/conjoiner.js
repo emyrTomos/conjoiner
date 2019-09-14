@@ -60,9 +60,17 @@ function Handler(notifier, path) {
         }
         return retVal;
       });
+    } else if (typeof value === 'object' && value !== null) {
+      var deepPath = path ? path + '.' + property : property;
+      var handler = new Handler(notifier, deepPath);
+      var retVal = new Proxy(value, handler);
+      return retVal;
     } else {
       return value;
     }
+  };
+  this.getPrototypeOf = function() {
+    return notifier;
   };
 }
 function Notifier(model) {

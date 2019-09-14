@@ -25,9 +25,17 @@ function Handler(notifier, path) {
         }
         return retVal
       })
+    } else if (typeof value === 'object' && value !== null) {
+      const deepPath = path ? path + '.' + property : property
+      const handler = new Handler(notifier, deepPath)
+      const retVal = new Proxy(value, handler)
+      return retVal
     } else {
       return value
     }
+  }
+  this.getPrototypeOf = function() {
+    return notifier
   }
 }
 
