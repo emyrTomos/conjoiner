@@ -4,7 +4,7 @@
   "description": "Bindings and controllers using ES6 proxies",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./test/server 'test' -o"
   },
   "repository": {
     "type": "git",
