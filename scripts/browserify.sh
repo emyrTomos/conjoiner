@@ -4,6 +4,6 @@ echo "$progname"
 if [ $progname ] && [ -x $progname ]; then
   browserify ./classes/conjoiner.js --outfile ./test/js/conjoiner.js
 else
-  echo "No music today, sorry..." >&2
+  echo "No music today, sorry... run npm install browserify -g then try again" >&2
   exit 1
 fi

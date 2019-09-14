@@ -2,45 +2,27 @@ describe("Notifier", function() {
 	const model = {
 		title: "Some String",
 		notTitle: "Some String",
-		members: {first: {title: 'First member'}, second: {title: 'Second member'}},
+		members: {first: 'First member', second: 'Second member'},
 		syncFunction: input => 'Synchronous: ' + input,
 		asyncFunction: async input => {
 			await new Promise(resolve => setTimeout(resolve, 1000))
 			return Promise.resolve('Asynchronous: ' + input)
 		}
 	}
+
+	const notifier = new conjoiner.Notifier(model)
+
 	const el = document.createElement('span')
-	let propertyChangeEvent
-	let syncFunctionCallEvent
-	let asyncFunctionCallPendingEvent
-	let asyncFunctionCallCompletedEvent
-	el.addEventListener('propertyChange', function(ev){
-		propertyChangeEvent = ev
-	})
-	el.addEventListener('functionCall', function(ev){
-		if (ev.detail.property === 'syncFunction')
-		{
-			syncFunctionCallEvent = ev
-		}
-		if (ev.detail.property === 'asyncFunction') {
-			if(ev.detail.completed) {
-				asyncFunctionCallCompletedEvent = ev
-			} else {
-				asyncFunctionCallPendingEvent = ev
-			}
-		}
-	})
 	const propertyBinding = {target: el, event: 'propertyChange', property: 'title'}
 	const syncFunctionBinding = {target: el, event: 'functionCall', property: 'syncFunction'}
 	const asyncFunctionBinding = {target: el, event: 'functionCall', property: 'asyncFunction'}
 	let lenBindings
 
-	const notifier = new conjoiner.Notifier(model)
 	beforeEach(function(){
 		lenBindings = notifier.bindings.length
 	})
 	describe('#addBinding', function(){
-		it("should add a binding to the bindings array", function() {
+		it('should add a binding to the bindings array', function() {
 			notifier.addBinding(propertyBinding)
 			notifier.bindings.length.should.equal(lenBindings + 1)
 		});
@@ -62,6 +44,28 @@ describe("Notifier", function() {
 		})
 	})
 	describe('#notify', function(){
+		let propertyChangeEvent
+		let syncFunctionCallEvent
+		let asyncFunctionCallPendingEvent
+		let asyncFunctionCallCompletedEvent
+		el.addEventListener('propertyChange', function(ev){
+			if(ev.detail.property === 'title') {
+				propertyChangeEvent = ev
+			}
+		})
+		el.addEventListener('functionCall', function(ev){
+			if (ev.detail.property === 'syncFunction')
+			{
+				syncFunctionCallEvent = ev
+			}
+			if (ev.detail.property === 'asyncFunction') {
+				if(ev.detail.completed) {
+					asyncFunctionCallCompletedEvent = ev
+				} else {
+					asyncFunctionCallPendingEvent = ev
+				}
+			}
+		})
 		describe('property change notifications', function(){
 			it('bound element should receive an event when the property it is bound to is modified', function(){
 				notifier.addBinding(propertyBinding)
@@ -128,7 +132,7 @@ describe("Notifier", function() {
 				describe('resolved promise', function(){
 					it('should exist', function(){
 						should.exist(asyncFunctionCallCompletedEvent)
-					})
+					}) 
 					it('should have same properties and values as pending event except for "result"', function(){
 						asyncFunctionCallCompletedEvent.detail.event.should.equal('functionCall')
 						asyncFunctionCallCompletedEvent.detail.arguments.length.should.equal(1)
@@ -142,6 +146,39 @@ describe("Notifier", function() {
 					})
 				})
 				return Promise.resolve(result)
+			})
+		})
+	})
+	describe('deep object', function(){
+		let deepPropertyChangeEvent
+		const deepPropertyBinding = {target: el, event: 'propertyChange', property: 'members.first'}
+		el.addEventListener('propertyChange', ev => {
+			if(ev.detail.event === deepPropertyBinding.property) {
+				deepPropertyChangeEvent = ev
+			}
+		})
+		notifier.addBinding(deepPropertyBinding)
+		describe('deep object property access', function(){
+			const first = notifier.model.members.first
+			it('should be a proxy object', function(){
+				const proto = Object.getPrototypeOf(first)
+				expect(proto).to.equal(notifier)
+			})
+		})
+		describe('deep object property modification', function(){
+			it('should raise a propertyChange event when an object field has a field modified', function(){
+				should.not.exist(deepPropertyChangeEvent)
+				notifier.model.first = "Modified Member"
+				should.exist(deepPropertyChangeEvent)
+			})
+			it('event detail "event" property should be propertyChange', function(){
+				deepPropertyChangeEvent.detail.event.should.equal('propertyChange')
+			})
+			it('event detail "property" property should be the property modified', function(){
+				propertyChangeEvent.detail.property.should.equal(deepPropertyBinding.property)
+			})
+			it('event detail "value" property should be the value that was set on the property', function(){
+				propertyChangeEvent.detail.value.should.equal("Modified Member")
 			})
 		})
 	})
