@@ -125,27 +125,25 @@ describe("Notifier", function() {
 			})
 			it('bound element should receive an event when the function return is resolved', function(done){
 				asyncFunctionReturn.then( (result) => {
-					should.exist(asyncFunctionCallCompletedEvent)
-					asyncFunctionCallCompletedEvent.detail.event.should.equal('functionCall')
-					asyncFunctionCallCompletedEvent.detail.arguments.length.should.equal(1)
-					asyncFunctionCallCompletedEvent.detail.arguments[0].should.equal('Function call')
-					asyncFunctionCallCompletedEvent.detail.result.should.equal(result)
+					describe('resolved promise', function(){
+						it('should exist', function(){
+							should.exist(asyncFunctionCallCompletedEvent)
+						})
+						it('should have same properties and values as pending event except for "result"', function(){
+							asyncFunctionCallCompletedEvent.detail.event.should.equal('functionCall')
+							asyncFunctionCallCompletedEvent.detail.arguments.length.should.equal(1)
+							asyncFunctionCallCompletedEvent.detail.arguments[0].should.equal('Function call')
+						})
+						it('event detail "result" property is expected to be defined', function(){
+							expect(asyncFunctionCallPendingEvent.detail.result).not.to.be.undefined
+						})
+						it('event detail "result" property should match resolution of function return', function(){
+							asyncFunctionCallCompletedEvent.detail.result.should.equal(result)
+						})
+					})
 				}).finally(done)
 			})
 		})
-/*		describe('asynchonous function call completed notifications', function(){
-			let asyncFunctionReturn
-			it('event detail "event" property should be functionCall', function(){
-			})
-			it('event detail "property" property should be the name of the function called', function(){
-				asyncFunctionCallCompletedEvent.detail.property.should.equal('asyncFunction')
-			})
-			it('event detail "argument" property should be the argument object that was sent to the function', function(){
-			})
-			it('event detail "result" property is expected to be undefined', function(){
-				expect(asyncFunctionCallCompletedEvent.detail.result).to.be.undefined
-			})
-		})*/
 	})
 
 });
