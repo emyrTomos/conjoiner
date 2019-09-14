@@ -1,4 +1,4 @@
-function Handler(notifier) {
+function Handler(notifier, path) {
   this.set = function(target, property, value, receiver) {
     notifier.notify({event: 'propertyChange', property: property, value: value})
     return Reflect.set(target, property, value, receiver)
@@ -34,7 +34,7 @@ function Handler(notifier) {
 
 function Notifier(model){
   Object.call(this)
-  const handler = new Handler(this)
+  const handler = new Handler(this, '')
   this.model = new Proxy(model, handler)
   this.bindings = []
 }

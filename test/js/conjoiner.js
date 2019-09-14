@@ -25,7 +25,7 @@ Object.defineProperties(exports, {
     }},
   __esModule: {value: true}
 });
-function Handler(notifier) {
+function Handler(notifier, path) {
   this.set = function(target, property, value, receiver) {
     notifier.notify({
       event: 'propertyChange',
@@ -67,8 +67,7 @@ function Handler(notifier) {
 }
 function Notifier(model) {
   Object.call(this);
-  var handler = new Handler(this);
-  console.log('Creatiing proxy ', model, handler);
+  var handler = new Handler(this, '');
   this.model = new Proxy(model, handler);
   this.bindings = [];
 }
