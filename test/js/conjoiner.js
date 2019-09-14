@@ -27,17 +27,15 @@ Object.defineProperties(exports, {
 });
 function NotifierTraps(notifier) {
   this.set = function(target, property, value, receiver, path) {
-    var deepPath = path ? path + '.' + property : property;
     var notification = {
       event: 'propertyChange',
-      property: deepPath,
+      property: path,
       value: value
     };
     notifier.notify(notification);
     return Reflect.set(target, property, value, receiver);
   };
   this.get = function(target, property, receiver, path) {
-    var deepPath = path ? path + '.' + property : property;
     var value = Reflect.get(target, property, receiver);
     if (typeof value === 'function') {
       return (function() {
@@ -45,8 +43,8 @@ function NotifierTraps(notifier) {
         var retVal = value.apply(receiver, args);
         var notification = {
           event: 'functionCall',
-          property: deepPath,
-          arguments: arguments
+          property: path,
+          arguments: args
         };
         if (retVal.then) {
           notification.completed = false;
@@ -64,7 +62,7 @@ function NotifierTraps(notifier) {
         return retVal;
       });
     } else if (typeof value === 'object' && value !== null) {
-      var handler = new Handler(this, deepPath);
+      var handler = new Handler(this, path);
       var retVal = new Proxy(value, handler);
       return retVal;
     } else {
@@ -74,10 +72,12 @@ function NotifierTraps(notifier) {
 }
 function Handler(traps, path) {
   this.set = function(target, property, value, receiver) {
-    return traps.set(target, property, value, receiver, path);
+    var deepPath = path ? path + '.' + property : property;
+    return traps.set(target, property, value, receiver, deepPath);
   };
   this.get = function(target, property, receiver) {
-    return traps.get(target, property, receiver, path);
+    var deepPath = path ? path + '.' + property : property;
+    return traps.get(target, property, receiver, deepPath);
   };
 }
 function Notifier(model) {
@@ -91,7 +91,6 @@ Notifier.prototype = Object.create(Object.prototype);
 Notifier.prototype.constructor = Notifier;
 Notifier.prototype.notify = function(notification) {
   this.bindings.forEach((function(binding) {
-    console.log('binding ', binding, ' notification ', notification);
     if (binding.event === notification.event && binding.property === notification.property) {
       var modelEvent = new CustomEvent(notification.event, {detail: notification});
       binding.target.dispatchEvent(modelEvent);
