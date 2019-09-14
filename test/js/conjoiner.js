@@ -69,9 +69,6 @@ function Handler(notifier, path) {
       return value;
     }
   };
-  this.getPrototypeOf = function() {
-    return notifier;
-  };
 }
 function Notifier(model) {
   Object.call(this);

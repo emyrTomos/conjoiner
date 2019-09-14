@@ -34,10 +34,10 @@ function Handler(notifier, path) {
       return value
     }
   }
-  this.getPrototypeOf = function() {
+/*  this.getPrototypeOf = function() {
     return notifier
   }
-}
+*/}
 
 
 function Notifier(model){
