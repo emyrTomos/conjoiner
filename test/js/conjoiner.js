@@ -25,16 +25,19 @@ Object.defineProperties(exports, {
     }},
   __esModule: {value: true}
 });
-function Handler(notifier, path) {
-  this.set = function(target, property, value, receiver) {
-    notifier.notify({
+function NotifierTraps(notifier) {
+  this.set = function(target, property, value, receiver, path) {
+    var deepPath = path ? path + '.' + property : property;
+    var notification = {
       event: 'propertyChange',
-      property: property,
+      property: deepPath,
       value: value
-    });
+    };
+    notifier.notify(notification);
     return Reflect.set(target, property, value, receiver);
   };
-  this.get = function(target, property, receiver) {
+  this.get = function(target, property, receiver, path) {
+    var deepPath = path ? path + '.' + property : property;
     var value = Reflect.get(target, property, receiver);
     if (typeof value === 'function') {
       return (function() {
@@ -42,7 +45,7 @@ function Handler(notifier, path) {
         var retVal = value.apply(receiver, args);
         var notification = {
           event: 'functionCall',
-          property: property,
+          property: deepPath,
           arguments: arguments
         };
         if (retVal.then) {
@@ -61,8 +64,7 @@ function Handler(notifier, path) {
         return retVal;
       });
     } else if (typeof value === 'object' && value !== null) {
-      var deepPath = path ? path + '.' + property : property;
-      var handler = new Handler(notifier, deepPath);
+      var handler = new Handler(this, deepPath);
       var retVal = new Proxy(value, handler);
       return retVal;
     } else {
@@ -70,9 +72,18 @@ function Handler(notifier, path) {
     }
   };
 }
+function Handler(traps, path) {
+  this.set = function(target, property, value, receiver) {
+    return traps.set(target, property, value, receiver, path);
+  };
+  this.get = function(target, property, receiver) {
+    return traps.get(target, property, receiver, path);
+  };
+}
 function Notifier(model) {
   Object.call(this);
-  var handler = new Handler(this, '');
+  var traps = new NotifierTraps(this);
+  var handler = new Handler(traps, '');
   this.model = new Proxy(model, handler);
   this.bindings = [];
 }
@@ -80,6 +91,7 @@ Notifier.prototype = Object.create(Object.prototype);
 Notifier.prototype.constructor = Notifier;
 Notifier.prototype.notify = function(notification) {
   this.bindings.forEach((function(binding) {
+    console.log('binding ', binding, ' notification ', notification);
     if (binding.event === notification.event && binding.property === notification.property) {
       var modelEvent = new CustomEvent(notification.event, {detail: notification});
       binding.target.dispatchEvent(modelEvent);

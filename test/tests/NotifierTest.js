@@ -151,13 +151,14 @@ describe("Notifier", function() {
 	})
 	describe('deep object', function(){
 		let deepPropertyChangeEvent
-		const deepPropertyBinding = {target: el, event: 'propertyChange', property: 'mnotifier.modelembers.first'}
-		el.addEventListener('propertyChange', ev => {
-			if(ev.detail.event === deepPropertyBinding.property) {
+		const el2 = document.createElement('span')
+		const deepPropertyBinding = {target: el2, event: 'propertyChange', property: 'members.first'}
+		notifier.addBinding(deepPropertyBinding)
+		el2.addEventListener('propertyChange', ev => {
+			if(ev.detail.property === deepPropertyBinding.property) {
 				deepPropertyChangeEvent = ev
 			}
 		})
-		notifier.addBinding(deepPropertyBinding)
 		describe('deep object property access', function(){
 			const first = notifier.model.members
 			it('should be a proxy object with the same prototype as the parent model in notifier', function(){
@@ -167,17 +168,17 @@ describe("Notifier", function() {
 		describe('deep object property modification', function(){
 			it('should raise a propertyChange event when an object field has a field modified', function(){
 				should.not.exist(deepPropertyChangeEvent)
-				notifier.model.first = "Modified Member"
+				notifier['model']['members']['first'] = "Modified Member"
 				should.exist(deepPropertyChangeEvent)
 			})
 			it('event detail "event" property should be propertyChange', function(){
 				deepPropertyChangeEvent.detail.event.should.equal('propertyChange')
 			})
 			it('event detail "property" property should be the property modified', function(){
-				propertyChangeEvent.detail.property.should.equal(deepPropertyBinding.property)
+				deepPropertyChangeEvent.detail.property.should.equal(deepPropertyBinding.property)
 			})
 			it('event detail "value" property should be the value that was set on the property', function(){
-				propertyChangeEvent.detail.value.should.equal("Modified Member")
+				deepPropertyChangeEvent.detail.value.should.equal("Modified Member")
 			})
 		})
 	})
