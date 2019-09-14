@@ -123,25 +123,25 @@ describe("Notifier", function() {
 			it('event detail "result" property is expected to be undefined', function(){
 				expect(asyncFunctionCallPendingEvent.detail.result).to.be.undefined
 			})
-			it('bound element should receive an event when the function return is resolved', function(done){
-				asyncFunctionReturn.then( (result) => {
-					describe('resolved promise', function(){
-						it('should exist', function(){
-							should.exist(asyncFunctionCallCompletedEvent)
-						})
-						it('should have same properties and values as pending event except for "result"', function(){
-							asyncFunctionCallCompletedEvent.detail.event.should.equal('functionCall')
-							asyncFunctionCallCompletedEvent.detail.arguments.length.should.equal(1)
-							asyncFunctionCallCompletedEvent.detail.arguments[0].should.equal('Function call')
-						})
-						it('event detail "result" property is expected to be defined', function(){
-							expect(asyncFunctionCallPendingEvent.detail.result).not.to.be.undefined
-						})
-						it('event detail "result" property should match resolution of function return', function(){
-							asyncFunctionCallCompletedEvent.detail.result.should.equal(result)
-						})
+			it('bound element should receive an event when the function return is resolved', async function(){
+				const result = await asyncFunctionReturn
+				describe('resolved promise', function(){
+					it('should exist', function(){
+						should.exist(asyncFunctionCallCompletedEvent)
 					})
-				}).finally(done)
+					it('should have same properties and values as pending event except for "result"', function(){
+						asyncFunctionCallCompletedEvent.detail.event.should.equal('functionCall')
+						asyncFunctionCallCompletedEvent.detail.arguments.length.should.equal(1)
+						asyncFunctionCallCompletedEvent.detail.arguments[0].should.equal('Function call')
+					})
+					it('event detail "result" property is expected to be defined', function(){
+						expect(asyncFunctionCallPendingEvent.detail.result).not.to.be.undefined
+					})
+					it('event detail "result" property should match resolution of function return', function(){
+						asyncFunctionCallCompletedEvent.detail.result.should.equal(result)
+					})
+				})
+				return Promise.resolve(result)
 			})
 		})
 	})
