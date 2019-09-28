@@ -1,4 +1,4 @@
-conjoiner = {}
+const conjoiner = {}
 import BaseController from './classes/BaseController'
 import Notifier from './classes/Notifier'
 conjoiner.BaseController = BaseController
