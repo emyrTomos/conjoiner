@@ -1,6 +1,6 @@
 conjoiner = {}
-import BaseController from './BaseController'
-import Notifier from './Notifier'
+import BaseController from './classes/BaseController'
+import Notifier from './classes/Notifier'
 conjoiner.BaseController = BaseController
 conjoiner.Notifier = Notifier
 export default conjoiner
