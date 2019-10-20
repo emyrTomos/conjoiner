@@ -1,5 +1,3 @@
 window.conjoiner = {}
-import BaseController from './BaseController'
-import Notifier from './Notifier'
-window.conjoiner.BaseController = BaseController
-window.conjoiner.Notifier = Notifier
+window.conjoiner.BaseController = require('./BaseController')
+window.conjoiner.Notifier = require('./Notifier')

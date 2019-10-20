@@ -15,11 +15,6 @@
     "controller",
     "proxy"
   ],
-  "browserify": {
-    "transform": [
-      "es6ify"
-    ]
-  },
   "author": "emyr.tomos@gmail.com",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
@@ -27,11 +22,6 @@
   },
   "homepage": "https://github.com/emyrTomos/conjoiner#readme",
   "devDependencies": {
-    "babel": "^6.23.0",
-    "babelify": "^10.0.0",
     "http-server": "^0.11.1"
-  },
-  "dependencies": {
-    "es6ify": "^1.6.0"
   }
 }

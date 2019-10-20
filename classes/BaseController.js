@@ -1,4 +1,4 @@
-import Notifier from './Notifier'
+const Notifier = require('./Notifier')
 
 function BaseController(model, view){
   Notifier.prototype.constructor.call(this, model)
@@ -9,4 +9,4 @@ BaseController.prototype = Object.create(Notifier.prototype);
 BaseController.prototype.constructor = BaseController
 
 
-export default BaseController
+module.exports = BaseController
