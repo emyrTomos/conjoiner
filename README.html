@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<h1>Conjoiner</h1>
+	<p>Conjoiner is intended to provide a simple native framework for MVC front end applications. It is born out of a frustration with Angular and an excitement about new ES6 developments like Proxies Custom Elements/Web Components along with new HTML constructs such as the template tag and the slot tag. </p>
+	<p>The notifier part is first out of the blocks - I hope to make the various parts individually useful so they are seperate exports.</p>
+	<p>The transpiler world still struggles a little with ES6 imports and the best feature of CommonJS/require, granular modules grouped together into a whole piece of code, struggles with ES6 import depth restrictions in ways I haven't bottomed out yet so the modules are grouped using require</p>
+	<p>Since class syntax is advertised as being for the most part syntactic sugar rather than a novel way of creating class-based code the old prototype syntax is used. This may change if the trees deepen as it does seem to make calling superclass methods simpler. </p>
+	<h2>Usage</h2>
+	<h3>Notifier</h3>
+	<p>The notifier provides the two-way bindings</p>
+	<p>From your project root run: </p>
+	<code>
+		npm install conjoiner --save
+	</code>
+	<p>Then in your javascript:</p> 
+	<code>
+		const Notifier = require('conjoiner').Notifier
+		let model = {
+			someProperty: "foo",
+			someFunction: par => { console.log('Parameter => ', par)}
+		}
+		const notifier = new Notifier(model)
+		model = notifier.model
+		const el = document.createElement('span')
+	</code>
+	<p>Add some bindings:</p> 
+	<code>
+		const propertyBinding = {target: el, event: 'propertyChange', property: 'someProperty'}
+		notifier.addBinding(propertyBinding)
+		el.addEventListener('propertyChange', function(ev){
+			if(ev.detail.property === 'someProperty') {
+				console.log('Got event ', ev.detail.property, ' changed to ', ev.detail.value)
+			}
+		})
+	</code>
+	<p>Then make a change to the notifier.model.someProperty field:</p>
+	<code>
+		model.someProperty = 'bar'
+		//expected result: 'Got event someProperty changed to bar'
+	</code>
+	<p>A more useful pattern might be to use the base controller, which also takes a view as an argument, and extend this to make controllers with bindings (which is the target goal of this part of the project): </p>
+	<code>
+		const BaseController = require('conjoiner').BaseController
+		function ReadingContext(model, view){
+		  BaseController.call(this, model, view)
+		  this.model.addBinding({target: view, event: 'propertyChange', property: 'someProperty'})
+		  this.view.addEventListener('change', ev => this.model.someProperty = this.view.value)
+		}
+		ReadingContext.prototype = Object.create(BaseController.prototype);
+		ReadingContext.prototype.constructor = ReadingContext;
+	</code>
+	<p>Available events:</p>
+	<ul>
+		<li><b>propertyChange</b></li>
+		<li><b>functionCall</b></li>
+	</ul>
+</body>
+</html>
