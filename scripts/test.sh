@@ -2,7 +2,8 @@
 progname=$(which browserify)
 echo "$progname"
 if [ $progname ] && [ -x $progname ]; then
-  browserify ./test/js/index.js --outfile ./test/js/conjoiner.js
+  browserify ./test/untranspiled/conjoiner.js --outfile ./test/js/conjoiner.js
+  ./test/server 'test' -o
 else
   echo "No music today, sorry... run npm install browserify -g then try again" >&2
   exit 1

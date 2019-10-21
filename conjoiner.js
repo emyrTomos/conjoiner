@@ -2,8 +2,8 @@
 const Notifier = require('./Notifier')
 
 function BaseController(model, view){
-  this.view = view
   Notifier.prototype.constructor.call(this, model)
+  this.view = view
 }
 
 BaseController.prototype = Object.create(Notifier.prototype);
@@ -98,8 +98,8 @@ Notifier.prototype.removeBinding = function(binding) {
 
 module.exports = Notifier
 },{}],3:[function(require,module,exports){
-const classes = {}
-classes.BaseController = require('./classes/BaseController')
-classes.Notifier = require('./classes/Notifier')
-module.exports = classes
-},{"./classes/BaseController":1,"./classes/Notifier":2}]},{},[3]);
+window.conjoiner = {}
+window.conjoiner.BaseController = require('./BaseController')
+window.conjoiner.Notifier = require('./Notifier')
+
+},{"./BaseController":1,"./Notifier":2}]},{},[3]);

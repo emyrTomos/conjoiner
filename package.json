@@ -4,7 +4,7 @@
   "description": "Bindings and controllers using ES6 proxies",
   "main": "index.js",
   "scripts": {
-    "test": "./test/server 'test' -o"
+    "test": "./scripts/test.sh"
   },
   "repository": {
     "type": "git",
