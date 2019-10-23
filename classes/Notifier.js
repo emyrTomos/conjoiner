@@ -6,7 +6,14 @@ function NotifierTraps(notifier) {
   }
   this.get = function(target, property, receiver, path) {
     const value = Reflect.get(target, property, receiver)
-    if (typeof value === 'function') {
+    if (Array.isArray(target)) {
+      return value
+    } else if (typeof value === 'function') {
+      if( property === 'toString') {
+        return (function() {
+          return ('Notifying proxy: ' + target.toString())
+        })
+      }
       return (function() {
         const args = Array.from(arguments)
         const retVal = value.apply(receiver, args)

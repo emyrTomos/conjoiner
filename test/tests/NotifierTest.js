@@ -1,4 +1,11 @@
 describe("Notifier", function() {
+	function class1(str) {
+		this.str = str
+		this.getStr = () => {return str}
+	}
+	class1.prototype = Object.create(Object.prototype)
+	class1.prototype.constructor = class1
+
 	const model = {
 		title: "Some String",
 		notTitle: "Some String",
@@ -7,7 +14,8 @@ describe("Notifier", function() {
 		asyncFunction: async input => {
 			await new Promise(resolve => setTimeout(resolve, 1000))
 			return Promise.resolve('Asynchronous: ' + input)
-		}
+		},
+		someArray: [new class1('foo'), new class1('bar'), new class1('baz')]
 	}
 
 	const notifier = new conjoiner.Notifier(model)
@@ -148,39 +156,45 @@ describe("Notifier", function() {
 				return Promise.resolve(result)
 			})
 		})
+		describe('deep object', function(){
+			let deepPropertyChangeEvent
+			const el2 = document.createElement('span')
+			const deepPropertyBinding = {target: el2, event: 'propertyChange', property: 'members.first'}
+			notifier.addBinding(deepPropertyBinding)
+			el2.addEventListener('propertyChange', ev => {
+				if(ev.detail.property === deepPropertyBinding.property) {
+					deepPropertyChangeEvent = ev
+				}
+			})
+			describe('deep object property access', function(){
+				const first = notifier.model.members
+				it('should be a proxy object with the same prototype as the parent model in notifier', function(){
+					expect(first.toString()).to.include('Notifying proxy: ')
+				})
+			})
+			describe('deep object property modification', function(){
+				it('should raise a propertyChange event when an object field has a field modified', function(){
+					should.not.exist(deepPropertyChangeEvent)
+					notifier['model']['members']['first'] = "Modified Member"
+					should.exist(deepPropertyChangeEvent)
+				})
+				it('event detail "event" property should be propertyChange', function(){
+					deepPropertyChangeEvent.detail.event.should.equal('propertyChange')
+				})
+				it('event detail "property" property should be the property modified', function(){
+					deepPropertyChangeEvent.detail.property.should.equal(deepPropertyBinding.property)
+				})
+				it('event detail "value" property should be the value that was set on the property', function(){
+					deepPropertyChangeEvent.detail.value.should.equal("Modified Member")
+				})
+			})
+		})
+		describe('array members accessed', function(){
+			it('should be returned without proxying', function(){
+				const arrayMember = notifier['model']['someArray'][0]
+				const rawArrayMember = model['someArray'][0]
+				expect(rawArrayMember).to.equal(arrayMember)
+			})
+		})
 	})
-	describe('deep object', function(){
-		let deepPropertyChangeEvent
-		const el2 = document.createElement('span')
-		const deepPropertyBinding = {target: el2, event: 'propertyChange', property: 'members.first'}
-		notifier.addBinding(deepPropertyBinding)
-		el2.addEventListener('propertyChange', ev => {
-			if(ev.detail.property === deepPropertyBinding.property) {
-				deepPropertyChangeEvent = ev
-			}
-		})
-		describe('deep object property access', function(){
-			const first = notifier.model.members
-			it('should be a proxy object with the same prototype as the parent model in notifier', function(){
-				expect(Object.getPrototypeOf(first)).to.equal(Object.getPrototypeOf(notifier.model))
-			})
-		})
-		describe('deep object property modification', function(){
-			it('should raise a propertyChange event when an object field has a field modified', function(){
-				should.not.exist(deepPropertyChangeEvent)
-				notifier['model']['members']['first'] = "Modified Member"
-				should.exist(deepPropertyChangeEvent)
-			})
-			it('event detail "event" property should be propertyChange', function(){
-				deepPropertyChangeEvent.detail.event.should.equal('propertyChange')
-			})
-			it('event detail "property" property should be the property modified', function(){
-				deepPropertyChangeEvent.detail.property.should.equal(deepPropertyBinding.property)
-			})
-			it('event detail "value" property should be the value that was set on the property', function(){
-				deepPropertyChangeEvent.detail.value.should.equal("Modified Member")
-			})
-		})
-	})
-
 });
