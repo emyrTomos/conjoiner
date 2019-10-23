@@ -25,7 +25,7 @@ function NotifierTraps(notifier) {
         const args = Array.from(arguments)
         const retVal = value.apply(receiver, args)
         const notification = {event: 'functionCall', property: path, arguments: args}
-        if(retVal.then) {
+        if(retVal && retVal.then) {
           notification.completed = false
           notifier.notify(notification)
           retVal.then(resolution => {
