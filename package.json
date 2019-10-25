@@ -13,7 +13,8 @@
   "keywords": [
     "binding",
     "controller",
-    "proxy"
+    "proxy",
+    "frontend"
   ],
   "author": "emyr.tomos@gmail.com",
   "license": "SEE LICENSE IN LICENSE",
