@@ -1,6 +1,6 @@
 {
   "name": "conjoiner",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Bindings and controllers using ES6 proxies",
   "main": "index.js",
   "scripts": {
