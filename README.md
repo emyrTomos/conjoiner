@@ -49,7 +49,7 @@ Add some bindings:
 Then make a change to the notifier.model.someProperty field:
 
 ```
-		model.someProperty = 'bar'
+		notifier.model.someProperty = 'bar'
 		//expected result: 'Got event someProperty changed to bar'
 ```
 
